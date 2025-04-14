@@ -1,0 +1,28 @@
+FROM python:3.11-slim
+
+# Install required system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m appuser
+
+# Set working directory
+WORKDIR /home/appuser/app
+
+# Copy application files and set ownership
+COPY --chown=appuser:appuser . .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
+# Use non-root user
+USER appuser
+
+# Expose application port
+EXPOSE 5000
+
+# Run the app
+CMD ["python", "SimpleTimeServiceApp.py"]
